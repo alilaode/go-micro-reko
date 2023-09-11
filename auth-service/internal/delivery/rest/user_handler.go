@@ -6,16 +6,14 @@ import (
 	"net/http"
 
 	"auth-service/internal/model"
+	"auth-service/internal/utils/response"
 
 	"github.com/labstack/echo/v4"
 	"github.com/sirupsen/logrus"
 )
 
-func (h *handler) RegisterUser(c echo.Context) error {
-	/*
-		ctx, span := tracing.CreateSpan(c.Request().Context(), "RegisterUser")
-		defer span.End()
-	*/
+func (h *Handler) RegisterUser(c echo.Context) error {
+
 	var request model.RegisterRequest
 
 	err := json.NewDecoder(c.Request().Body).Decode(&request)
@@ -41,34 +39,30 @@ func (h *handler) RegisterUser(c echo.Context) error {
 	})
 }
 
-func (h *handler) Login(c echo.Context) error {
-	var request model.LoginRequest
+func (h *Handler) Login(c echo.Context) error {
 
-	err := json.NewDecoder(c.Request().Body).Decode(&request)
-	if err != nil {
-		fmt.Printf("got error %s\n", err.Error())
+	var (
+		err     error
+		request = new(model.LoginRequest)
+	)
 
-		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
-			"error": err.Error(),
-		})
+	if err = c.Bind(request); err != nil {
+		return response.ErrorBuilder(&response.ErrorConstant.BadRequest, err).Send(c)
 	}
 
-	sessionData, err := h.userUseCase.Login(c.Request().Context(), request)
+	if err = c.Validate(request); err != nil {
+		return response.ErrorBuilder(&response.ErrorConstant.Validation, err).Send(c)
+	}
+
+	sessionData, err := h.userUseCase.Login(c.Request().Context(), *request)
 	if err != nil {
 
 		logrus.WithFields(logrus.Fields{
 			"err": err,
 		}).Error("[delivery][rest][user_handler][Login] unable to login")
-
-		//fmt.Printf("got error %s\n", err.Error())
-
-		return c.JSON(http.StatusInternalServerError, map[string]interface{}{
-			"error": err.Error(),
-		})
+		return response.ErrorResponse(err).Send(c)
 	}
 
-	return c.JSON(http.StatusOK, map[string]interface{}{
-		"data": sessionData,
-	})
+	return response.SuccessResponse(sessionData).Send(c)
 
 }

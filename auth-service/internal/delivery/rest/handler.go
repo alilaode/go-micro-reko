@@ -2,10 +2,10 @@ package rest
 
 import "auth-service/internal/usecase/user"
 
-type handler struct {
+type Handler struct {
 	userUseCase user.UseCase
 }
 
-func NewHandler(authUseCase user.UseCase) *handler {
-	return &handler{userUseCase: authUseCase}
+func NewHandler(authUseCase user.UseCase) *Handler {
+	return &Handler{userUseCase: authUseCase}
 }

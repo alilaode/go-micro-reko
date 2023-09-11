@@ -26,6 +26,7 @@ require (
 	github.com/google/uuid v1.3.1
 	github.com/labstack/echo/v4 v4.11.1
 	github.com/leodido/go-urn v1.2.4 // indirect
+	github.com/pkg/errors v0.9.1
 	github.com/sirupsen/logrus v1.9.3
 	golang.org/x/crypto v0.11.0 // indirect
 	golang.org/x/net v0.12.0 // indirect

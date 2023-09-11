@@ -10,6 +10,8 @@ import (
 	logger "auth-service/internal/Logger"
 	"auth-service/internal/database"
 	"auth-service/internal/delivery/rest"
+	"auth-service/internal/delivery/rest/middleware"
+	"auth-service/internal/delivery/rest/router"
 
 	uRepo "auth-service/internal/repository/user"
 	uUseCase "auth-service/internal/usecase/user"
@@ -46,8 +48,8 @@ func main() {
 
 	h := rest.NewHandler(userUseCase)
 
-	rest.LoadMiddlewares(e)
-	rest.LoadRouters(e, h)
+	middleware.Init(e)
+	router.Init(e, h)
 
 	e.Logger.Fatal(e.Start(fmt.Sprintf(":%d", webPort)))
 
